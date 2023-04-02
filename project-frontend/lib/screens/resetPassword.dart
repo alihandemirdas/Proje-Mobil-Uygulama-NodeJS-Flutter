@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:proje/controllers/userForgotPassword.dart';
+import 'package:proje/screens/resetPasswordCode.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -70,7 +72,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 height: 20,
               ),
               ElevatedButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    if(emailController.text.isNotEmpty){
+                      doForgetPassword(emailController.text);
+                    }
+                    else{
+                      showAlertDialog(context, "Boş bırakılan alanları doldurunuz.", "Hata");
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xffEE6352),
                       shape: RoundedRectangleBorder( //to set border radius to button
@@ -87,4 +96,44 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       ),
     );
   }
+
+  doForgetPassword(String email) async{
+    var res = await userForgotPassword(email.trim());
+    if (res['status'] == 'SUCCESS'){
+      print(res['message']);
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResetPasswordCodePage()));
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+  }
+
+
+  showAlertDialog(BuildContext context, String data, String title) {
+
+    Widget okButton = TextButton(
+      child: Text("Tamam"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true)
+            .pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Color(0xffF1E5FB),
+      title: Text('${title}'),
+      content: Text('${data}'),
+      actions: [
+        okButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  
 }

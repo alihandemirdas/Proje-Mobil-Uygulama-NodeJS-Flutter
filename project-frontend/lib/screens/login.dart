@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage>
                       doLogin(usernameController.text,passwordController.text);
                     }
                     else{
-                      showAlertDialog(context, "Boş bırakılan alanları doldurunuz.");
+                      showAlertDialog(context, "Boş bırakılan alanları doldurunuz.", "Hata");
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -177,11 +177,11 @@ class _LoginPageState extends State<LoginPage>
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MyHomePage()));
     }
     else{
-      showAlertDialog(context, res['message']);
+      showAlertDialog(context, res['message'], "Hata");
     }
   }
 
-  showAlertDialog(BuildContext context, String data) {
+  showAlertDialog(BuildContext context, String data, String title) {
 
     Widget okButton = TextButton(
       child: Text("Tamam"),
@@ -193,7 +193,7 @@ class _LoginPageState extends State<LoginPage>
 
     AlertDialog alert = AlertDialog(
       backgroundColor: Color(0xffF1E5FB),
-      title: Text("Hata"),
+      title: Text('${title}'),
       content: Text('${data}'),
       actions: [
         okButton,

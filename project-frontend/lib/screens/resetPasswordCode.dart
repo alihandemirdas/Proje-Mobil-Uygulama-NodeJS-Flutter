@@ -1,37 +1,23 @@
 import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:proje/controllers/userForgotPassword.dart';
+import 'package:proje/controllers/userResetPassword.dart';
 import 'package:proje/screens/login.dart';
-import 'package:proje/screens/resetPassword.dart';
-import 'package:proje/controllers/userRegister.dart';
 
-class RegisterPage extends StatefulWidget {
+class ResetPasswordCodePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _RegisterPageState();
+    return _ResetPasswordCodePageState();
   }
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _ResetPasswordCodePageState extends State<ResetPasswordCodePage> {
 
-  @override
-  void initState() {
-    super.initState();
-    //goResetPasswordPage();
-  }
-
-  void goResetPasswordPage() {
-    Timer(Duration(seconds: 10), () {
-      Route route = MaterialPageRoute(builder: (_) => ResetPasswordPage());
-      Navigator.pushReplacement(context, route);
-    });
-  }
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController surnameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController codeController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController password2Controller = TextEditingController();
 
 
   @override
@@ -58,66 +44,19 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ],
               ),
-              const Text("KAYIT OL",
+              SizedBox(
+                height: 40,
+              ),
+              const Text("Size gönderilen kodu ve ardından yeni şifrenizi giriniz.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontFamily: 'Montserrat',
-                    fontSize: 35,
-                    fontWeight: FontWeight.w700
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500
                 ),
               ),
               SizedBox(
-                height: 10,
-              ),
-              Divider(color: Color(0xff484D6D), thickness: 1),
-              SizedBox(
-                height: 50,
-              ),
-              Row(
-                children: [
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Color(0xffD9D9D9),
-                          borderRadius: BorderRadius.all(Radius.circular(12))
-                      ),
-                      //width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(5),
-                      child: TextFormField(
-                        controller: nameController,
-                        obscureText: false,
-                        decoration: InputDecoration(
-                            hintText: "Ad:",
-                            border: InputBorder.none
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Color(0xffD9D9D9),
-                          borderRadius: BorderRadius.all(Radius.circular(12))
-                      ),
-                      //width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(5),
-                      child: TextFormField(
-                        controller: surnameController,
-                        obscureText: false,
-                        decoration: InputDecoration(
-                            hintText: "Soyad:",
-                            border: InputBorder.none
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
+                height: 20,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -126,34 +65,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 padding: EdgeInsets.all(5),
                 child: TextFormField(
-                  controller: emailController,
+                  controller: codeController,
                   obscureText: false,
                   decoration: InputDecoration(
-                    hintText: "E-posta:",
+                    hintText: "Kod:",
                     border: InputBorder.none,
                   ),
                 ),
               ),
               SizedBox(
-                height: 15,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Color(0xffD9D9D9),
-                    borderRadius: BorderRadius.all(Radius.circular(12))
-                ),
-                padding: EdgeInsets.all(5),
-                child: TextFormField(
-                  controller: usernameController,
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    hintText: "Kullanıcı Adı:",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15,
+                height: 20,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -165,18 +86,39 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    hintText: "Şifre:",
+                    hintText: "Yeni Şifre:",
                     border: InputBorder.none,
                   ),
                 ),
               ),
-              SizedBox(height: 25,),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Color(0xffD9D9D9),
+                    borderRadius: BorderRadius.all(Radius.circular(12))
+                ),
+                padding: EdgeInsets.all(5),
+                child: TextFormField(
+                  controller: password2Controller,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: "Yeni Şifre:",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               ElevatedButton(
                   onPressed: (){
-                    if(nameController.text.isNotEmpty && surnameController.text.isNotEmpty && emailController.text.isNotEmpty && usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
-                      doRegister(nameController.text, surnameController.text, emailController.text, usernameController.text,passwordController.text);
-                    }
-                    else{
+                    if(codeController.text.isNotEmpty && (passwordController.text == password2Controller.text)){
+                      doResetPassword(codeController.text, passwordController.text);
+                    }else if(passwordController.text != password2Controller.text){
+                      showAlertDialog(context, "Girilen şifreler aynı değil.", "Hata");
+                    }else{
                       showAlertDialog(context, "Boş bırakılan alanları doldurunuz.", "Hata");
                     }
                   },
@@ -188,7 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
                       minimumSize: Size.fromHeight(0)
                   ),
-                  child: const Text("KAYIT OL", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
+                  child: const Text("ŞİFREMİ SIFIRLA", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
               ),
             ],
           ),
@@ -197,20 +139,20 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  doRegister(String name, String surname, String email, String username, String password) async{
-    var res = await userRegister(name.trim(), surname.trim(), email.trim(), username.trim(), password.trim());
+  doResetPassword(String token, String password) async{
+    var res = await userResetPassword(token.trim(), password.trim());
     if (res['status'] == 'SUCCESS'){
-      print(res['message']);
       showAlertDialog(context, res['message'], "Başarılı");
+      print(res['message']);
       Timer(Duration(seconds: 3), () {
-        Navigator.push(context,MaterialPageRoute(builder: (context) => LoginPage()));
+        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => LoginPage()));
       });
     }
     else{
-      print(res['message']);
       showAlertDialog(context, res['message'], "Hata");
     }
   }
+
 
   showAlertDialog(BuildContext context, String data, String title) {
 
