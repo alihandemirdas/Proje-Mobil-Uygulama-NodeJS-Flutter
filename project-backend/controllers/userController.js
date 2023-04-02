@@ -22,7 +22,7 @@ const sendPasswordResetMail = async (name, email, token) => {
             from:config.emailUsername,
             to:email,
             subject:'Password Reset for Dönem Projesi',
-            html: '<p> Hi '+name+', please copy the link and <a href="http://127.0.0.1:3000/reset-password?token='+token+'">reset your password</a></a> </p>'
+            html: '<p> Merhaba '+name+',<br><br>Şifreni sıfırlamak için aşağıda gönderilen kodu kullanabilirsin.<br> Kod: '+token+'<br><br>İyi çalışmalar dileriz.<br>System Admin</p>'
         }
 
         sender.sendMail(mailOptions,function(error,info){
@@ -163,7 +163,6 @@ const register = async (req,res) => {
 
 const forgetPassword = async (req,res) => {
     try {
-        
         const email = req.body.email;
         const userData = await User.findOne({email:email});
 
@@ -173,19 +172,19 @@ const forgetPassword = async (req,res) => {
             sendPasswordResetMail(userData.name, userData.email, random);
             res.json({
                 status: "SUCCESS",
-                message: "Email adresini kontrol edin."
+                message: "Email adresinizi kontrol edin."
             })
         }else{
             res.json({
                 status: "FAILED",
-                message: "Kayitli email bulunamadi."
+                message: "Kayıtlı email adresi bulunamadı."
             })
         }
 
     } catch (error) {
         res.json({
             status: "FAILED",
-            message: "Sifremi unuttum kisminda bir hata olustu."
+            message: "Sistemsel bir hata oluştu. Daha sonra tekrar deneyin."
         })
     }
 }
@@ -195,25 +194,25 @@ const resetPassword = async (req,res) => {
         const token = req.query.token;
         const tokenData = await User.findOne({token:token})
         if(tokenData){
-            const password = req.body.password;
+            const password = req.query.password;
             const newpw = await bcrypt.hash(password,10);
             const userData = await User.findByIdAndUpdate({_id:tokenData._id},{$set: {password:newpw,token:''}},{new:true});
             res.json({
                 status: "SUCCESS",
-                message: "Sifre basariyla degistirildi.",
+                message: "Şifre sıfırlama işlemi başarıyla gerçekleştirildi.",
                 data: userData
             })
 
         }else{
             res.json({
                 status: "FAILED",
-                message: "Bu token linki gecersiz."
+                message: "Şifre yenileme kodunuz geçersizdir."
             })
         }
     } catch (error) {
         res.json({
             status: "FAILED",
-            message: "Kayitli email bulunamadi."
+            message: "Sistemsel bir hata oluştu. Daha sonra tekrar deneyin."
         })
     }
 }
