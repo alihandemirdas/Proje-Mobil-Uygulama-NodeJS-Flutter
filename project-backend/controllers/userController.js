@@ -21,8 +21,8 @@ const sendPasswordResetMail = async (name, email, token) => {
         const mailOptions = {
             from:config.emailUsername,
             to:email,
-            subject:'Password Reset for Dönem Projesi',
-            html: '<p> Merhaba '+name+',<br><br>Şifreni sıfırlamak için aşağıda gönderilen kodu kullanabilirsin.<br> Kod: '+token+'<br><br>İyi çalışmalar dileriz.<br>System Admin</p>'
+            subject:'Şifre Sıfırlama İsteği',
+            html: '<p> Merhaba '+name+',<br><br>Şifreni sıfırlamak için aşağıda gönderilen kodu kullanabilirsin.<br> Kod: <strong>'+token+'</strong><br><br>İyi çalışmalar dileriz.<br>System Admin</p>'
         }
 
         sender.sendMail(mailOptions,function(error,info){
