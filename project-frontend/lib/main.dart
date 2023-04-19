@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:proje/screens/login.dart';
 import 'package:proje/screens/register.dart';
+import 'package:proje/screens/work.dart';
 
 void main() => runApp(new MyApp());
 
@@ -28,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    goLoginPage();
+    goWorkPage();
     //goRegisterPage();
   }
 
@@ -42,6 +43,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void goLoginPage() {
     Timer(Duration(seconds: 5), () {
       Route route = MaterialPageRoute(builder: (_) => LoginPage());
+      Navigator.pushReplacement(context, route);
+    });
+  }
+
+  void goWorkPage() {
+    Timer(Duration(seconds: 5), () {
+      Route route = MaterialPageRoute(builder: (_) => WorkPage());
       Navigator.pushReplacement(context, route);
     });
   }
