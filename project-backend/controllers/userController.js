@@ -59,6 +59,7 @@ const login = async (req,res) => {
         await User.find({username})
         .then(data => {
             if(data){
+                console.log(data)
                 const hashedPW = data[0].password;
                 bcrypt.compare(password, hashedPW)
                 .then(result => {
