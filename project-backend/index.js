@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 var bodyParser = require("body-parser");
 const userRoutes = require('./routes/userRoutes')
+const workRoutes = require('./routes/workroutes')
 const app = express()
 
 app.use(bodyParser.json());
@@ -13,4 +14,5 @@ mongoose.connect(databaseURL) //hata verirse -> dbURL, {useNewUrlParser: true , 
     .catch((err) => console.log(err))
 
 app.listen(3000)
-app.use('/api',userRoutes)
+app.use('/api', userRoutes)
+app.use('/work', workRoutes)

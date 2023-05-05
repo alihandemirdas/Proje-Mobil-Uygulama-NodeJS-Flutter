@@ -1,19 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const User = require('../models/users')
 
 const WorksSchema = new mongoose.Schema({
     userid: {
-        type: String,
-        default: ""
+        type: Schema.Types.ObjectId,
+        ref: User.modelName
     },
     title: String,
+    status: String,
     short: String,
-    tasks: [{
-        title: String,
-        long: String,
-    }],
-
 });
 
-const User = mongoose.model("User",UserSchema);
-module.exports = User;
+const Work = mongoose.model("Work",WorksSchema);
+module.exports = Work;
