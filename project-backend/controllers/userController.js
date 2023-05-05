@@ -59,7 +59,6 @@ const login = async (req,res) => {
         await User.find({username})
         .then(data => {
             if(data){
-                console.log(data)
                 const hashedPW = data[0].password;
                 bcrypt.compare(password, hashedPW)
                 .then(result => {
@@ -67,7 +66,7 @@ const login = async (req,res) => {
                         res.json({
                             status: "SUCCESS",
                             message: "Başarıyla giriş yapıldı.",
-                            data: result
+                            id: data[0]._id
                         })
                     }else{
                         res.json({

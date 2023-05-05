@@ -41,18 +41,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void goLoginPage() {
-    Timer(Duration(seconds: 5), () {
+    Timer(Duration(seconds: 1), () {
       Route route = MaterialPageRoute(builder: (_) => LoginPage());
       Navigator.pushReplacement(context, route);
     });
   }
 
-  void goWorkPage() {
+  /*void goWorkPage() {
     Timer(Duration(seconds: 5), () {
       Route route = MaterialPageRoute(builder: (_) => WorkPage());
       Navigator.pushReplacement(context, route);
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {

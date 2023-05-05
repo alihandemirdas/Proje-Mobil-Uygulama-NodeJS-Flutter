@@ -3,8 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:proje/controllers/getAllWorks.dart';
+
 class WorkPage extends StatefulWidget
 {
+  String id;
+  WorkPage({required this.id});
+
   @override
   State<StatefulWidget> createState() {
     return _WorkPageState();
@@ -13,35 +18,49 @@ class WorkPage extends StatefulWidget
 
 class _WorkPageState extends State<WorkPage>
 {
+  List myList = [];
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController shortController = TextEditingController();
+
+
   @override
   void initState() {
     super.initState();
+    doGetAllWorks(widget.id);
   }
 
-  /*void goRegisterPage() {
-    Timer(Duration(seconds: 10), () {
-      Route route = MaterialPageRoute(builder: (_) => RegisterPage());
-      Navigator.pushReplacement(context, route);
-    });
-  }*/
-  List<String> myList = ['Öğe 1', 'Öğe 2', 'Öğe 3'];
 
   @override
   Widget build(BuildContext context){
     return Material(
-      child: SingleChildScrollView(
-        child: ListView(
-          children: myList.map((item) {
-            return ListTile(
-              title: Text(item),
-            );
-          }).toList(),
-        ),
+      child: ListView.builder(
+          padding: EdgeInsets.all(5),
+          itemCount: myList.length,
+          itemBuilder: (context, index) {
+            var containers = myList.map((e) => Container(
+              margin: EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
+              color: Colors.yellowAccent,
+              child: Text(e["short"]),
+            )).toList();
+            return containers[index];
+          }
       ),
     );
 
   }
 
+  doGetAllWorks(String id) async{
+    var res = await getAllWorks(widget.id);
+    if (res['status'] == 'SUCCESS'){
+      myList = res['data'];
+      print("Buraya geliyor.");
+      setState(() {});
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+  }
 
   showAlertDialog(BuildContext context, String data, String title) {
 

@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:proje/screens/register.dart';
 import 'package:proje/screens/resetPassword.dart';
+import 'package:proje/screens/work.dart';
 
 class LoginPage extends StatefulWidget
 {
@@ -174,7 +175,8 @@ class _LoginPageState extends State<LoginPage>
     var res = await userLogin(username.trim(), password.trim());
     if (res['status'] == 'SUCCESS'){
       print(res['message']);
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MyHomePage()));
+      String id = res['id'];
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => WorkPage(id: id)));
     }
     else{
       showAlertDialog(context, res['message'], "Hata");

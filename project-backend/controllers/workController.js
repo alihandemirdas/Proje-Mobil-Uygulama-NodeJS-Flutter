@@ -19,10 +19,11 @@ const addWork = async (req,res) => {
     })
     work.save()
     .then(result => {
+        console.log(result)
         res.json({
             status: "SUCCESS",
             message: "İş ekleme başarıyla tamamlandı",
-            data: result
+            workid: result._id
         })
     })
     .catch(err => {
@@ -44,9 +45,11 @@ const changeWorkStatus = async (req,res) => {
 
 const getAllWorks = async (req,res) => {
     
+    console.log("Method Type: GET | Get All Works")
+    console.log(req.query);
+    console.log("\n")
     let userid = req.query.userid;
     const workDatas = await Work.find({userid})
-    console.log(workDatas)
 
     if(workDatas){
         res.json({
