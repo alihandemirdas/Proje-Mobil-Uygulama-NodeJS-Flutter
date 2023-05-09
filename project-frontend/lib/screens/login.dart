@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/userLogin.dart';
 import 'package:proje/main.dart';
+import 'package:proje/screens/home.dart';
 import 'dart:async';
 
 import 'package:proje/screens/register.dart';
@@ -176,7 +177,8 @@ class _LoginPageState extends State<LoginPage>
     if (res['status'] == 'SUCCESS'){
       print(res['message']);
       String id = res['id'];
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => WorkPage(id: id)));
+      String name = res['name'];
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => HomePage(userid: id, name: name)));
     }
     else{
       showAlertDialog(context, res['message'], "Hata");

@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    goLoginPage();
+    //goLoginPage();
     //goRegisterPage();
   }
 
@@ -54,14 +54,64 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }*/
 
+  int _selectedIndex = 0;
+
+  static List<Widget> _widgetOptions = <Widget>[
+    Text(
+      'Özet',
+      style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+    ),
+    Text(
+      'Takip',
+      style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+    ),
+    Text(
+      'Muhasebe',
+      style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+    ),
+    Text(
+      'Market',
+      style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+    ),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: Container(
-        color: Color(0xffefe9f4),
-        child: Center(
-            child: Text("ANA SAYFA")
-        ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Özet',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assessment),
+            label: 'Takip',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance),
+            label: 'Muhasebe',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Market',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Color(0xffEE6352),
+        fixedColor: Color(0xff000000),
+        //selectedItemColor: Color(0xff000000),
+        onTap: _onItemTapped,
       ),
     );
   }
