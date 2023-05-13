@@ -10,6 +10,8 @@ const WorksSchema = new mongoose.Schema({
     title: String,
     status: String,
     short: String,
+    lastDate: String,
+    money: Number
 });
 
 const Work = mongoose.model("Work",WorksSchema);

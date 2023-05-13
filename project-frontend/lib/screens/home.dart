@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage>
                         fontWeight: FontWeight.w700
                     ),
                   ),
-                  Text(" (Son tarihe göre sıralanacak)",
+                  Text(" (Son tarihe göre sıralandı)",
                     style: TextStyle(
                         color: Color(0xff000000),
                         fontFamily: 'Montserrat',
@@ -121,7 +122,13 @@ class _HomePageState extends State<HomePage>
                                 ),
                                 Divider(color: Color(0xffEE6352), thickness: 1),
                                 Row(
-                                  children: [Expanded(child: Text(e["short"]))],
+                                  children: [
+                                    Expanded(
+                                        child: Text(e["short"])
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Text("Son: ${e["lastDate"]}", )
+                                  ],
                                 ),
                               ],
                             ),
@@ -145,6 +152,13 @@ class _HomePageState extends State<HomePage>
     var res = await getAllWorks(widget.userid);
     if (res['status'] == 'SUCCESS'){
       myList = res['data'];
+
+      myList.sort((a, b) {
+        DateTime dateA = DateFormat('dd.MM.yyyy').parse(a['lastDate']);
+        DateTime dateB = DateFormat('dd.MM.yyyy').parse(b['lastDate']);
+        return dateA.compareTo(dateB);
+      });
+
       print("Buraya geliyor.");
       setState(() {});
     }

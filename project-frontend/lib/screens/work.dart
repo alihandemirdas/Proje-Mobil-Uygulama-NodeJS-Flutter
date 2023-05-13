@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
@@ -26,12 +28,17 @@ class _WorkPageState extends State<WorkPage>
   List myList = [];
   final TextEditingController titleController = TextEditingController();
   final TextEditingController shortController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController moneyController = TextEditingController();
+  DateTime? selectedDate;
+  var selectedOption;
 
 
   @override
   void initState() {
     super.initState();
     doGetAllWorks(widget.id);
+    initializeDateFormatting('tr_TR');
   }
 
 
@@ -173,8 +180,8 @@ class _WorkPageState extends State<WorkPage>
     }
   }
 
-  doAddWork(String title, String short ) async{
-    var res = await addWork(widget.id, title, "Active", short);
+  doAddWork(String title, String status, String short, String lastDate, String money) async{
+    var res = await addWork(widget.id, title, status, short, lastDate, money);
     if (res['status'] == 'SUCCESS'){
       showAlertDialog(context, "İş başarıyla eklendi", "Başarılı");
       doGetAllWorks(widget.id);
@@ -227,41 +234,100 @@ class _WorkPageState extends State<WorkPage>
   }
 
   void addWorkDialog() {
+
+    List<String> options = [
+      'Aktif',
+      'Bekleyen',
+      'Tamamlanmış',
+    ];
+
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('İş Ekle'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(labelText: 'Başlık'),
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('İş Ekle'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(labelText: 'Başlık'),
+                  ),
+                  TextField(
+                    controller: shortController,
+                    decoration: InputDecoration(labelText: 'Kısa Açıklama'),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 365)),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          selectedDate = picked;
+                          dateController.text = DateFormat.yMd('tr_TR').format(selectedDate!);
+                        });
+                      }
+                    },
+                    child: IgnorePointer(
+                      child: TextFormField(
+                        controller: dateController,
+                        decoration: InputDecoration(
+                          labelText: 'Tarih',
+                          suffixIcon: Icon(Icons.calendar_month),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15,),
+                  DropdownButton<String>(
+                    value: selectedOption,
+                    hint: Text("İş Durumu"),
+                    items: options.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedOption = newValue;
+                      });
+                    },
+                  ),
+                  TextField(
+                    controller: moneyController,
+                    decoration: InputDecoration(labelText: 'Ücret'),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Vazgeç'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
-                TextField(
-                  controller: shortController,
-                  decoration: InputDecoration(labelText: 'Kısa Açıklama'),
+                TextButton(
+                  child: Text('Ekle'),
+                  onPressed: () {
+                    doAddWork(titleController.text, selectedOption, shortController.text, dateController.text, moneyController.text); // seçilen tarihi ekleyeceğimiz işin bitirilmesi gereken tarihi olarak kaydediyoruz
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
-            ),
-            actions: [
-              TextButton(
-                child: Text('Vazgeç'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('Ekle'),
-                onPressed: () {
-                  doAddWork(titleController.text, shortController.text);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
+            );
+          },
+        );
+      },
+    );
   }
+
+
 
 }

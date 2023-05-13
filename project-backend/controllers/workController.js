@@ -6,16 +6,19 @@ const addWork = async (req,res) => {
     console.log("Method Type: POST | Add Work\n")
     console.log(req.body);
     console.log("\n\n")
-    let {userid,title,status,short} = req.body;
+    let {userid,title,status,short, lastDate, money} = req.body;
     userid = userid.trim();
     title = title.trim();
     status = status.trim();
+    money = parseFloat(money)
 
     const work = new Work({
         userid,
         title,
         status,
         short,
+        lastDate,
+        money
     })
     work.save()
     .then(result => {
@@ -27,6 +30,7 @@ const addWork = async (req,res) => {
         })
     })
     .catch(err => {
+        console.log(err)
         res.json({
             status: "FAILED",
             message: "İş eklenirken bir hata oluştu."
