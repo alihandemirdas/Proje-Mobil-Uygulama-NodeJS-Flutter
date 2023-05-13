@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/userLogin.dart';
 import 'package:proje/main.dart';
+import 'package:proje/screens/bottomnb.dart';
 import 'package:proje/screens/home.dart';
 import 'dart:async';
 
@@ -178,7 +179,7 @@ class _LoginPageState extends State<LoginPage>
       print(res['message']);
       String id = res['id'];
       String name = res['name'];
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => HomePage(userid: id, name: name)));
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BnbPage(userid: id, name: name)));
     }
     else{
       showAlertDialog(context, res['message'], "Hata");

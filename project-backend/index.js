@@ -14,5 +14,10 @@ mongoose.connect(databaseURL) //hata verirse -> dbURL, {useNewUrlParser: true , 
     .catch((err) => console.log(err))
 
 app.listen(3000)
+
+app.get("/", (req,res) => {
+    res.send('Aktif');
+})
+
 app.use('/api', userRoutes)
 app.use('/work', workRoutes)

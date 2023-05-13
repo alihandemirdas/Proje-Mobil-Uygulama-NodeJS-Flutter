@@ -66,7 +66,8 @@ const login = async (req,res) => {
                         res.json({
                             status: "SUCCESS",
                             message: "Başarıyla giriş yapıldı.",
-                            id: data[0]._id
+                            id: data[0]._id,
+                            name: data[0].name
                         })
                     }else{
                         res.json({

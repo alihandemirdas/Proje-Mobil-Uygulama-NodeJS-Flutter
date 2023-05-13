@@ -76,7 +76,9 @@ class _TaskPageState extends State<TaskPage>
                 children: [
                   Flexible(
                     child: ElevatedButton(
-                        onPressed: (){},
+                        onPressed: (){
+                          addTaskDialog();
+                        },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xff08B2E3),
                             shape: RoundedRectangleBorder(
@@ -161,23 +163,11 @@ class _TaskPageState extends State<TaskPage>
     }
   }
 
-  doGetAllWorks(String id) async{
-    var res = await getAllWorks(widget.userid);
-    if (res['status'] == 'SUCCESS'){
-      myList = res['data'];
-      print("Buraya geliyor.");
-      setState(() {});
-    }
-    else{
-      showAlertDialog(context, res['message'], "Hata");
-    }
-  }
-
   doAddTaskToWork(String title, String long) async{
-    var res = await addTaskToWork(widget.userid, 'abc', title, long);
+    var res = await addTaskToWork(widget.userid, widget.workid, title, long);
     if (res['status'] == 'SUCCESS'){
       showAlertDialog(context, "Görev başarıyla eklendi", "Başarılı");
-      doGetAllWorks(widget.userid);
+      doGetAllTasks(widget.workid);
       print("Buraya geliyor.");
       setState(() {});
     }
@@ -213,7 +203,7 @@ class _TaskPageState extends State<TaskPage>
     );
   }
 
-  /*void addWorkDialog() {
+  void addTaskDialog() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -242,13 +232,13 @@ class _TaskPageState extends State<TaskPage>
               TextButton(
                 child: Text('Ekle'),
                 onPressed: () {
-                  doAddWork(titleController.text, longController.text);
+                  doAddTaskToWork(titleController.text, longController.text);
                   Navigator.of(context).pop();
                 },
               ),
             ],
           );
         });
-  }*/
+  }
 
 }

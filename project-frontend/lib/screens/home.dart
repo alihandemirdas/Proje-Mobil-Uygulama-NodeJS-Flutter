@@ -23,11 +23,13 @@ class HomePage extends StatefulWidget
 class _HomePageState extends State<HomePage>
 {
   List myList = [];
+  var kontrol = 0;
 
 
   @override
   void initState() {
     super.initState();
+    doGetAllWorks(widget.userid);
   }
 
 
@@ -44,61 +46,36 @@ class _HomePageState extends State<HomePage>
           ),
           child: Column(
             children: [
+              SizedBox(height: 25,),
               Row(
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 15,),
-              Row(
-                children: [
-                  Text("MEVCUT GÖREVLER",
+                  Text("Hoşgeldin, ${widget.name} !",
                     style: TextStyle(
                         color: Color(0xffEE6352),
                         fontFamily: 'Montserrat',
                         fontSize: 20,
-                        fontWeight: FontWeight.w700
+                        fontWeight: FontWeight.w600
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 15,),
+              SizedBox(height: 35,),
               Row(
                 children: [
-                  Flexible(
-                    child: ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xff08B2E3),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)
-                            ),
-                            padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                            minimumSize: Size.fromHeight(0)
-                        ),
-                        child: const Text("GÖREV EKLE", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
+                  Text("ÖZET",
+                    style: TextStyle(
+                        color: Color(0xff000000),
+                        fontFamily: 'Montserrat',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700
                     ),
                   ),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  Flexible(
-                    child: ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xff08B2E3),
-                            shape: RoundedRectangleBorder( //to set border radius to button
-                                borderRadius: BorderRadius.circular(30)
-                            ),
-                            padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                            minimumSize: Size.fromHeight(0)
-                        ),
-                        child: const Text("GÖREV SİL", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
+                  Text(" (Son tarihe göre sıralanacak)",
+                    style: TextStyle(
+                        color: Color(0xff000000),
+                        fontFamily: 'Montserrat',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600
                     ),
                   ),
                 ],
@@ -109,32 +86,50 @@ class _HomePageState extends State<HomePage>
                     padding: EdgeInsets.all(2),
                     itemCount: myList.length,
                     itemBuilder: (context, index) {
-                      var containers = myList.map((e) => Container(
-                        margin: EdgeInsets.all(7),
-                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Color(0xffD9D9D9),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
+                      if (index < 3) {
+                        var e = myList[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xffD9D9D9)
+                          ),
+                          child: Container(
+                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Color(0xffffffff),
+                            ),
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        e["title"],
+                                        style: TextStyle(
+                                            color: Color(0xff000000),
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Divider(color: Color(0xffEE6352), thickness: 1),
+                                Row(
+                                  children: [Expanded(child: Text(e["short"]))],
+                                ),
                               ],
                             ),
-                            SizedBox(height: 10,),
-                            Divider(color: Color(0xffEE6352), thickness: 1),
-                            Row(
-                              children: [
-                                Expanded(child: Text(e["long"]),)
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),).toList();
-                      return containers[index];
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink(); // Görünmez widget
+                      }
                     }
                 ),
               ),
