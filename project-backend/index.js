@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 var bodyParser = require("body-parser");
 const userRoutes = require('./routes/userRoutes')
 const workRoutes = require('./routes/workroutes')
+const moneyRoutes = require('./routes/moneyRoutes')
 const app = express()
 
 app.use(bodyParser.json());
@@ -21,3 +22,4 @@ app.get("/", (req,res) => {
 
 app.use('/api', userRoutes)
 app.use('/work', workRoutes)
+app.use('/money', moneyRoutes)

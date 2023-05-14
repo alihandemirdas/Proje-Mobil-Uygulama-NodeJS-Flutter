@@ -34,7 +34,7 @@ class _BnbPageState extends State<BnbPage>
     final screens = [
       HomePage(userid: widget.userid, name: widget.name),
       WorkPage(id: widget.userid),
-      AccountingPage(),
+      AccountingPage(id: widget.userid,),
       MarketPage()
     ];
     sc = screens;

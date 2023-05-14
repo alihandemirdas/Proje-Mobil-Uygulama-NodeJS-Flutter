@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:proje/controllers/addMoney.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
 import 'package:proje/controllers/getAllTasks.dart';
@@ -180,9 +181,26 @@ class _WorkPageState extends State<WorkPage>
     }
   }
 
+  doAddMoney(String id, String title, String type, String money) async{
+    var res = await addMoney(widget.id, title, type, money);
+    if (res['status'] == 'SUCCESS'){
+      print("Money API çalıştı.");
+    }
+    else{
+      print("Money API çalışmadı.");
+    }
+  }
+
   doAddWork(String title, String status, String short, String lastDate, String money) async{
     var res = await addWork(widget.id, title, status, short, lastDate, money);
     if (res['status'] == 'SUCCESS'){
+
+      if(status == "Tamamlanmış"){
+        doAddMoney(widget.id, title, "Gelir", money);
+      }else{
+        doAddMoney(widget.id, title, "Alacak", money);
+      }
+
       showAlertDialog(context, "İş başarıyla eklendi", "Başarılı");
       doGetAllWorks(widget.id);
       print("Buraya geliyor.");
