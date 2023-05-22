@@ -1,6 +1,5 @@
 const Money = require('../models/money')
 
-
 const addMoneyAPI = async (req,res) => {
     
     console.log("Method Type: POST | Add Gelir\n")
