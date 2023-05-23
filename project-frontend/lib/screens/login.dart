@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage>
       print(res['message']);
       String id = res['id'];
       String name = res['name'];
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BnbPage(userid: id, name: name)));
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => BnbPage(userid: id, name: name, selectedIndex: 0,)));
     }
     else{
       showAlertDialog(context, res['message'], "Hata");

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
+import 'package:proje/controllers/getAllMoney.dart';
 import 'package:proje/controllers/getAllTasks.dart';
 import 'dart:async';
 
@@ -23,7 +24,9 @@ class HomePage extends StatefulWidget
 
 class _HomePageState extends State<HomePage>
 {
+  double toplam = 0;
   List myList = [];
+  List money = [];
   var kontrol = 0;
 
 
@@ -31,6 +34,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     doGetAllWorks(widget.userid);
+    doGetAllMoney();
   }
 
 
@@ -71,7 +75,7 @@ class _HomePageState extends State<HomePage>
                         fontWeight: FontWeight.w700
                     ),
                   ),
-                  Text(" (Son tarihe göre sıralandı)",
+                  Text(" (Son Tarihe Göre)",
                     style: TextStyle(
                         color: Color(0xff000000),
                         fontFamily: 'Montserrat',
@@ -82,62 +86,91 @@ class _HomePageState extends State<HomePage>
                 ],
               ),
               SizedBox(height: 20,),
-              Expanded(
+              SingleChildScrollView(
                 child: ListView.builder(
                     padding: EdgeInsets.all(2),
                     itemCount: myList.length,
-                    itemBuilder: (context, index) {
-                      if (index < 3) {
-                        var e = myList[index];
-                        return Container(
+                    shrinkWrap: true,
+                    itemBuilder: (context, i) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Color(0xffD9D9D9)
+                        ),
+                        child: Container(
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Color(0xffD9D9D9)
+                            borderRadius: BorderRadius.circular(15),
+                            color: Color(0xffffffff),
                           ),
-                          child: Container(
-                            margin: EdgeInsets.all(10),
-                            padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Color(0xffffffff),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        e["title"],
-                                        style: TextStyle(
-                                            color: Color(0xff000000),
-                                            fontFamily: 'Montserrat',
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Divider(color: Color(0xffEE6352), thickness: 1),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(e["short"])
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      myList[i]["title"],
+                                      style: TextStyle(
+                                          color: Color(0xff000000),
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600),
                                     ),
-                                    SizedBox(width: 10,),
-                                    Text("Son: ${e["lastDate"]}", )
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Divider(color: Color(0xffEE6352), thickness: 1),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: Text(myList[i]["short"])
+                                  ),
+                                  SizedBox(width: 10,),
+                                  Text("Son: ${myList[i]["lastDate"]}", )
+                                ],
+                              ),
+                            ],
                           ),
-                        );
-                      } else {
-                        return SizedBox.shrink(); // Görünmez widget
-                      }
+                        ),
+                      );
                     }
+                ),
+              ),
+              SizedBox(height: 10,),
+              Divider(color: Color(0xff484D6D), thickness: 1, indent: 30, endIndent: 30,),
+              SizedBox(height: 10,),
+              Card(
+                elevation: 8.0,
+                color: Color(0xffC5C5C5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22.0)),
+                child: Container(
+                  height: 100,
+                  padding: EdgeInsets.only(left:5,right:5,bottom:5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: Text("Kesinleşen Kazancın: ",textAlign: TextAlign.center, style: TextStyle(
+                            color: Color(0xff484D6D),
+                            fontSize: 15,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w600,
+                        ),),
+                      ),
+                      SizedBox(height: 5,),
+                      Text("${toplam}₺", textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 30,
+                            color: Color(0xff00AA1B),
+                            fontWeight: FontWeight.w700),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -148,16 +181,41 @@ class _HomePageState extends State<HomePage>
 
   }
 
+  doGetAllMoney() async{
+    var res = await getAllMoney(widget.userid);
+    if (res['status'] == 'SUCCESS'){
+      money = res['data'];
+      double gider = 0;
+      double gelir = 0;
+      for(int i=0; i<money.length; i++){
+        if(money[i]["type"] == "Gelir"){
+          gelir += money[i]["money"];
+        }
+        if(money[i]["type"] == "Gider"){
+          gider += money[i]["money"];
+        }
+      }
+
+      toplam = gelir-gider;
+      setState(() {});
+    }
+  }
+
   doGetAllWorks(String id) async{
     var res = await getAllWorks(widget.userid);
     if (res['status'] == 'SUCCESS'){
       myList = res['data'];
+
+      myList.removeWhere((item) => item["status"] == "Tamamlanmış");
 
       myList.sort((a, b) {
         DateTime dateA = DateFormat('dd.MM.yyyy').parse(a['lastDate']);
         DateTime dateB = DateFormat('dd.MM.yyyy').parse(b['lastDate']);
         return dateA.compareTo(dateB);
       });
+
+      myList = myList.sublist(0, 3);
+      print(myList);
 
       print("Buraya geliyor.");
       setState(() {});

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:proje/controllers/addMoney.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
+import 'package:proje/controllers/deleteMoney.dart';
 import 'package:proje/controllers/getAllMoney.dart';
 import 'package:proje/controllers/getAllTasks.dart';
 import 'dart:async';
@@ -144,37 +145,47 @@ class _AccountingPageState extends State<AccountingPage>
                 child: ListView.builder(
                     padding: EdgeInsets.all(2),
                     itemCount: myList.length,
+                    shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      var containers = myList.map((e) => Container(
-                        margin: EdgeInsets.all(7),
-                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                         // color: Color(0xffD9D9D9),
+                      var containers = myList.map((e) => InkWell(
+                        onTap: () {
+                            if(e["workid"] == ""){
+                              deleteMoneyDialog(e["_id"]);
+                            }else{
+                              showAlertDialog(context, "İş kaydı olan para bilgisi sadece iş silinirse silinebilir", "Hata");
+                            }
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(7),
+                          padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            // color: Color(0xffD9D9D9),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text("●"),
+                                  SizedBox(width: 10,),
+                                  Expanded(
+                                    child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 15, fontWeight: FontWeight.w600),),
+                                  ),
+                                  SizedBox(width: 10,),
+                                  Expanded(
+                                    child: Text("${e["money"].toString()}₺",textAlign: TextAlign.end,style: TextStyle(
+                                        color: getColorMoney(e["type"]),
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600
+                                    ),),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text("●"),
-                                SizedBox(width: 10,),
-                                Expanded(
-                                  child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 15, fontWeight: FontWeight.w600),),
-                                ),
-                                SizedBox(width: 10,),
-                                Expanded(
-                                  child: Text("${e["money"].toString()}₺",textAlign: TextAlign.end,style: TextStyle(
-                                      color: getColorMoney(e["type"]),
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600
-                                  ),),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),).toList();
+                      )).toList();
                       return containers[index];
                     }
                 ),
@@ -202,8 +213,20 @@ class _AccountingPageState extends State<AccountingPage>
     }
   }
 
+  doDeleteMoney(String id) async{
+    var res = await deleteMoney(id);
+    if (res['status'] == 'SUCCESS'){
+      showAlertDialog(context, "Para bilgisi başarıyla silindi", "Başarılı");
+      doGetAllMoney();
+      setState(() {});
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+  }
+
   doAddMoney(String id, String title, String type, String money) async{
-    var res = await addMoney(widget.id, title, type, money);
+    var res = await addMoney(widget.id, title, type, money, "");
     if (res['status'] == 'SUCCESS'){
       showAlertDialog(context, "${type} başarıyla eklendi", "Başarılı");
       doGetAllMoney();
@@ -298,6 +321,34 @@ class _AccountingPageState extends State<AccountingPage>
                 child: Text('Ekle'),
                 onPressed: () {
                   doAddMoney(widget.id, titleController.text, type, moneyController.text);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void deleteMoneyDialog(id) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Muhasebe Bilgisi Sil'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+            ),
+            actions: [
+              TextButton(
+                child: Text('Vazgeç'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Sil'),
+                onPressed: () {
+                  doDeleteMoney(id);
                   Navigator.of(context).pop();
                 },
               ),

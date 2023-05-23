@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future userForgotPassword(String email) async {
+Future deleteWork (String workid) async {
 
-  final response = await http.post(Uri.parse("http://10.0.2.2:3000/api/forget-password"),
+  final response = await http.post(Uri.parse("http://10.0.2.2:3000/work/delete-work"),
       headers: {"Accept":"Application/json"},
-      body: {'email':email}
+      body: {"workid":workid}
   );
 
   var decodedData = jsonDecode(response.body);

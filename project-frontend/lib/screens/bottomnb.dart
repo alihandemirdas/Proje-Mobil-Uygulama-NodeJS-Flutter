@@ -17,7 +17,8 @@ import 'package:proje/screens/work.dart';
 class BnbPage extends StatefulWidget
 {
   String userid, name;
-  BnbPage({required this.userid, required this.name});
+  int selectedIndex;
+  BnbPage({required this.userid, required this.name, required this.selectedIndex});
 
   @override
   State<StatefulWidget> createState() {
@@ -28,19 +29,19 @@ class BnbPage extends StatefulWidget
 class _BnbPageState extends State<BnbPage>
 {
   List sc = [];
+  int _selectedIndex = 0;
   @override
   void initState() {
     super.initState();
     final screens = [
       HomePage(userid: widget.userid, name: widget.name),
-      WorkPage(id: widget.userid),
+      WorkPage(id: widget.userid, name: widget.name),
       AccountingPage(id: widget.userid,),
       MarketPage()
     ];
     sc = screens;
+    _selectedIndex = widget.selectedIndex;
   }
-
-  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {

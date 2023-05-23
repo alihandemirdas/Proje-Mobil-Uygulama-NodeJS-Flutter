@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 Future userResetPassword(String token, String password) async {
 
-  final response = await http.get(Uri.parse("http://10.0.2.2:8080/api/reset-password?token=${token}&password=${password}"),
+  final response = await http.get(Uri.parse("http://10.0.2.2:3000/api/reset-password?token=${token}&password=${password}"),
       headers: {"Accept":"Application/json"},
   );
 

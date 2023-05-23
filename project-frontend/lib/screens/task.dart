@@ -3,16 +3,22 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
+import 'package:proje/controllers/deleteMoneyByWorkId.dart';
+import 'package:proje/controllers/deleteTask.dart';
+import 'package:proje/controllers/deleteWork.dart';
 import 'package:proje/controllers/getAllTasks.dart';
 import 'dart:async';
 
 import 'package:proje/controllers/getAllWorks.dart';
+import 'package:proje/controllers/updateMoneyType.dart';
+import 'package:proje/controllers/updateWorkStatus.dart';
+import 'package:proje/screens/bottomnb.dart';
 import 'package:proje/screens/login.dart';
 
 class TaskPage extends StatefulWidget
 {
-  String userid, workid;
-  TaskPage({required this.userid, required this.workid});
+  String userid, workid, name, status;
+  TaskPage({required this.userid, required this.workid, required this.name, required this.status});
 
   @override
   State<StatefulWidget> createState() {
@@ -22,9 +28,11 @@ class TaskPage extends StatefulWidget
 
 class _TaskPageState extends State<TaskPage>
 {
+  //String name = "";
   List myList = [];
   final TextEditingController titleController = TextEditingController();
   final TextEditingController longController = TextEditingController();
+  var selectedOption;
 
 
   @override
@@ -95,7 +103,10 @@ class _TaskPageState extends State<TaskPage>
                   ),
                   Flexible(
                     child: ElevatedButton(
-                        onPressed: (){},
+                        onPressed: (){
+                          doDeleteWork();
+                          //Navigator.of(context).pop();
+                        },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xff08B2E3),
                             shape: RoundedRectangleBorder( //to set border radius to button
@@ -104,7 +115,30 @@ class _TaskPageState extends State<TaskPage>
                             padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
                             minimumSize: Size.fromHeight(0)
                         ),
-                        child: const Text("GÖREV SİL", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
+                        child: const Text("İŞ SİL", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  Flexible(
+                    child: ElevatedButton(
+                        onPressed: (){
+                          if(widget.status == "Tamamlanmış"){
+                            showAlertDialog(context, "Tamamlanmış iş durumu değiştirilemez", "Hata");
+                          }else{
+                            updateWorkDialog(widget.status);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xff08B2E3),
+                            shape: RoundedRectangleBorder( //to set border radius to button
+                                borderRadius: BorderRadius.circular(30)
+                            ),
+                            padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                            minimumSize: Size.fromHeight(0)
+                        ),
+                        child: const Text("İŞ GÜNCELLE", style: TextStyle(color: Color(0xff484D6D), fontSize: 13, fontWeight: FontWeight.w900),)
                     ),
                   ),
                 ],
@@ -115,31 +149,36 @@ class _TaskPageState extends State<TaskPage>
                     padding: EdgeInsets.all(2),
                     itemCount: myList.length,
                     itemBuilder: (context, index) {
-                      var containers = myList.map((e) => Container(
-                        margin: EdgeInsets.all(7),
-                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Color(0xffD9D9D9),
+                      var containers = myList.map((e) => InkWell(
+                        onTap: () {
+                          deleteTaskDialog(e["_id"]);
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(7),
+                          padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Color(0xffD9D9D9),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
+                                ],
+                              ),
+                              SizedBox(height: 10,),
+                              Divider(color: Color(0xffEE6352), thickness: 1),
+                              Row(
+                                children: [
+                                  Expanded(child: Text(e["long"]),)
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Divider(color: Color(0xffEE6352), thickness: 1),
-                            Row(
-                              children: [
-                                Expanded(child: Text(e["long"]),)
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),).toList();
+                      )).toList();
                       return containers[index];
                     }
                 ),
@@ -150,6 +189,90 @@ class _TaskPageState extends State<TaskPage>
       ),
     );
 
+  }
+
+  doUpdateMoneyWorkId(String workid, String type) async{
+    var res = await updateMoneyTypeWorkId(workid, type);
+    if (res['status'] == 'SUCCESS'){
+      print(res['message']);
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+  }
+
+  doUpdateWorkStatus(String nstatus, String status) async{
+
+    if(status == "Aktif" && nstatus == "Tamamlanmış")
+    {
+      var res = await updateWorkStatus(widget.workid, nstatus);
+      if (res['status'] == 'SUCCESS'){
+        doUpdateMoneyWorkId(widget.workid, "Gelir");
+        showAlertDialog(context, res['message'], "Başarılı");
+      }
+      else{
+        showAlertDialog(context, res['message'], "Hata");
+      }
+    }
+    else if((status == "Aktif" && nstatus == "Bekleyen") || (status == "Bekleyen" && nstatus == "Aktif"))
+    {
+      var res = await updateWorkStatus(widget.workid, nstatus);
+      if (res['status'] == 'SUCCESS'){
+        showAlertDialog(context, res['message'], "Başarılı");
+      }
+      else{
+        showAlertDialog(context, res['message'], "Hata");
+      }
+    }
+    else if(status == "Bekleyen" && nstatus == "Tamamlanmış")
+    {
+      var res = await updateWorkStatus(widget.workid, nstatus);
+      if (res['status'] == 'SUCCESS'){
+        doUpdateMoneyWorkId(widget.workid, "Gelir");
+        showAlertDialog(context, res['message'], "Başarılı");
+      }
+      else{
+        showAlertDialog(context, res['message'], "Hata");
+      }
+    }
+  }
+
+  doDeleteWork() async{
+    var res = await deleteWork(widget.workid);
+    if (res['status'] == 'SUCCESS'){
+      doDeleteMoneyByWorkId(widget.workid);
+      Navigator.push(context,
+        MaterialPageRoute(
+          builder: (context) => BnbPage(userid: widget.userid, name: widget.name, selectedIndex: 1,)),
+        );
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+  }
+  
+  doDeleteMoneyByWorkId(String workid) async{
+    var res = await deleteMoneyByWorkId(workid);
+    if (res['status'] == 'SUCCESS'){
+      print("İşe ait money silindi.");
+    }
+    else{
+      print("İşe ait money silinmedi.");
+    }
+
+  }
+
+  doDeleteTask(String id) async{
+    var res = await deleteTask(id);
+    if (res['status'] == 'SUCCESS'){
+      showAlertDialog(context, "Görev silindi", "Başarılı");
+      doGetAllTasks(widget.workid);
+      print("Buraya geliyor.");
+      setState(() {});
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
   }
 
   doGetAllTasks(String id) async{
@@ -233,6 +356,88 @@ class _TaskPageState extends State<TaskPage>
                 child: Text('Ekle'),
                 onPressed: () {
                   doAddTaskToWork(titleController.text, longController.text);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void updateWorkDialog(String status) {
+
+    List<String> options = [
+      'Aktif',
+      'Bekleyen',
+      'Tamamlanmış',
+    ];
+
+    options.remove(status);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Görev Durumu Güncelle'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButton<String>(
+                  value: selectedOption,
+                  hint: Text("İş Durumu"),
+                  items: options.map((String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(option),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedOption = newValue;
+                    });
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text('Vazgeç'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Güncelle'),
+                onPressed: () {
+                  doUpdateWorkStatus(selectedOption, status);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void deleteTaskDialog(id) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Görev Sil'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+            ),
+            actions: [
+              TextButton(
+                child: Text('Vazgeç'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Sil'),
+                onPressed: () {
+                  doDeleteTask(id);
                   Navigator.of(context).pop();
                 },
               ),

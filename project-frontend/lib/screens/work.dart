@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:proje/controllers/addMoney.dart';
 import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
+import 'package:proje/controllers/deleteMoneyByWorkId.dart';
 import 'package:proje/controllers/getAllTasks.dart';
 import 'dart:async';
 
@@ -15,8 +16,8 @@ import 'package:proje/screens/task.dart';
 
 class WorkPage extends StatefulWidget
 {
-  String id;
-  WorkPage({required this.id});
+  String id, name;
+  WorkPage({required this.id, required this.name});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,6 +28,7 @@ class WorkPage extends StatefulWidget
 class _WorkPageState extends State<WorkPage>
 {
   List myList = [];
+  //String name = "";
   final TextEditingController titleController = TextEditingController();
   final TextEditingController shortController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -89,7 +91,7 @@ class _WorkPageState extends State<WorkPage>
                   SizedBox(
                     width: 16,
                   ),
-                  Flexible(
+                  /*Flexible(
                     child: ElevatedButton(
                         onPressed: (){},
                         style: ElevatedButton.styleFrom(
@@ -102,13 +104,14 @@ class _WorkPageState extends State<WorkPage>
                         ),
                         child: const Text("İŞ SİL", style: TextStyle(color: Color(0xff484D6D), fontSize: 15, fontWeight: FontWeight.w900),)
                     ),
-                  ),
+                  ),*/
                 ],
               ),
               SizedBox(height: 20,),
               Expanded(
                 child: ListView.builder(
                     padding: EdgeInsets.all(2),
+                    shrinkWrap: true,
                     itemCount: myList.length,
                     itemBuilder: (context, index) {
                       var containers = myList.map((e) => InkWell(
@@ -117,7 +120,7 @@ class _WorkPageState extends State<WorkPage>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TaskPage(userid: widget.id, workid: e["_id"]),
+                              builder: (context) => TaskPage(userid: widget.id, workid: e["_id"], name: widget.name, status: e["status"],),
                             ),
                           );
                         },
@@ -181,8 +184,8 @@ class _WorkPageState extends State<WorkPage>
     }
   }
 
-  doAddMoney(String id, String title, String type, String money) async{
-    var res = await addMoney(widget.id, title, type, money);
+  doAddMoney(String id, String title, String type, String money, String workid) async{
+    var res = await addMoney(widget.id, title, type, money, workid);
     if (res['status'] == 'SUCCESS'){
       print("Money API çalıştı.");
     }
@@ -191,19 +194,29 @@ class _WorkPageState extends State<WorkPage>
     }
   }
 
+  doDeleteMoneyByWorkId(String workid) async{
+    var res = await deleteMoneyByWorkId(workid);
+    if (res['status'] == 'SUCCESS'){
+      print("İşe ait money silindi.");
+    }
+    else{
+      print("İşe ait money silinmedi.");
+    }
+
+  }
+
   doAddWork(String title, String status, String short, String lastDate, String money) async{
     var res = await addWork(widget.id, title, status, short, lastDate, money);
     if (res['status'] == 'SUCCESS'){
 
       if(status == "Tamamlanmış"){
-        doAddMoney(widget.id, title, "Gelir", money);
+        doAddMoney(widget.id, title, "Gelir", money, res['workid']);
       }else{
-        doAddMoney(widget.id, title, "Alacak", money);
+        doAddMoney(widget.id, title, "Alacak", money, res['workid']);
       }
 
       showAlertDialog(context, "İş başarıyla eklendi", "Başarılı");
       doGetAllWorks(widget.id);
-      print("Buraya geliyor.");
       setState(() {});
     }
     else{

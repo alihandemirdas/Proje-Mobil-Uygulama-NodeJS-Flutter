@@ -1,5 +1,7 @@
 const Work = require('../models/works')
 const Task = require('../models/tasks')
+const mongoose = require('mongoose');
+
 
 const addWork = async (req,res) => {
     
@@ -12,6 +14,7 @@ const addWork = async (req,res) => {
     status = status.trim();
     money = parseFloat(money)
 
+
     const work = new Work({
         userid,
         title,
@@ -20,9 +23,9 @@ const addWork = async (req,res) => {
         lastDate,
         money
     })
+
     work.save()
     .then(result => {
-        console.log(result)
         res.json({
             status: "SUCCESS",
             message: "İş ekleme başarıyla tamamlandı",
@@ -39,12 +42,92 @@ const addWork = async (req,res) => {
     
 }
 
-const deleteWork = async (req,res) => {
-    
+async function deleteTasksByWorkId(workid) {
+    try {
+        const result = await Task.deleteMany({ workid: workid })
+        .then(result => {
+            console.log("Belirtilen taskler silindi");
+        })
+        .catch(err => {
+            console.log("Bir hata oluştu"+err);
+        })
+    } catch (err) {
+      console.error('Hata:', err);
+    }
 }
 
-const changeWorkStatus = async (req,res) => {
-    
+const deleteWork = async (req,res) => {
+    console.log("Method Type: POST | Delete Work\n")
+    console.log(req.body);
+    console.log("\n\n")
+    let {workid} = req.body;
+    deleteTasksByWorkId(workid);
+
+    Work.findByIdAndDelete(workid)
+    .then(result => {
+        res.json({
+            status: "SUCCESS",
+            message: "İş ve işe ait görevler silindi.",
+            data: result
+        })
+    })
+    .catch(err => {
+        res.json({
+            status: "FAILED",
+            message: "Silme aşamasında bir hata oluştu.",
+            data: err
+        })
+    })
+
+
+}
+
+const deleteTask = async (req,res) => {
+    console.log("Method Type: POST | Delete Task\n")
+    console.log(req.body);
+    console.log("\n\n")
+    let {taskid} = req.body;
+
+    Task.findByIdAndDelete(taskid)
+    .then(result => {
+        res.json({
+            status: "SUCCESS",
+            message: "Görev başarıyla silindi.",
+            data: result
+        })
+    })
+    .catch(err => {
+        res.json({
+            status: "FAILED",
+            message: "Silme aşamasında bir hata oluştu.",
+            data: err
+        })
+    })
+
+
+}
+
+const updateWorkStatus = async (req,res) => {
+    console.log("Method Type: POST | updateWorkStatus\n")
+    console.log(req.body);
+    console.log("\n\n")
+    let {id, status} = req.body;
+
+    Work.findByIdAndUpdate({ _id: id }, { $set: { status: status} }, { new: true })
+    .then(result => {
+        res.json({
+            status: "SUCCESS",
+            message: "İş durumu başarıyla güncellendi.",
+            data: result
+        })
+    })
+    .catch(err => {
+        res.json({
+            status: "FAILED",
+            message: "Silme aşamasında bir hata oluştu.",
+            data: err
+        })
+    })
 }
 
 const getAllWorks = async (req,res) => {
@@ -124,8 +207,9 @@ const addTaskToWork = async (req,res) => {
 module.exports = {
     addWork,
     deleteWork,
-    changeWorkStatus,
+    updateWorkStatus,
     getAllWorks,
     addTaskToWork,
-    getAllTasks
+    getAllTasks,
+    deleteTask
 }

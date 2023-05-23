@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 Future getAllWorks(String userid) async {
 
-  final response = await http.get(Uri.parse("http://10.0.2.2:8080/work/get-all-works?userid=${userid}"),
+  final response = await http.get(Uri.parse("http://10.0.2.2:3000/work/get-all-works?userid=${userid}"),
     headers: {"Accept":"Application/json"},
   );
 
