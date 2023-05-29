@@ -14,7 +14,7 @@ const TaskSchema = new mongoose.Schema({
     },
     title: String,
     long: String,
-
+    active: String
 });
 
 const Task = mongoose.model("Task",TaskSchema);

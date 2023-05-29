@@ -42,6 +42,29 @@ const addWork = async (req,res) => {
     
 }
 
+async function gAllTasksCount(workid) {
+    try {
+        const tasks = await Task.find({workid});
+        let tum = tasks.length
+        let aktif = 0
+        let tamam = 0
+        
+
+        tasks.forEach(e => {
+            if(e["active"] == "false"){
+                aktif+=1
+            }else{
+                tamam+=1
+            }
+        });
+
+        const data = tum.toString()+","+aktif.toString()+","+tamam.toString()
+        return data;
+    } catch (err) {
+      console.error('Hata:', err);
+    }
+}
+
 async function deleteTasksByWorkId(workid) {
     try {
         const result = await Task.deleteMany({ workid: workid })
@@ -130,6 +153,35 @@ const updateWorkStatus = async (req,res) => {
     })
 }
 
+const updateTaskActive = async (req,res) => {
+    console.log("Method Type: POST | updateTaskActive\n")
+    console.log(req.body);
+    console.log("\n\n")
+    let {id, active} = req.body;
+
+    if(active == "false"){
+        active = "true"
+    }else{
+        active = "false"
+    }
+
+    Task.findByIdAndUpdate({ _id: id }, { $set: { active: active} }, { new: true })
+    .then(result => {
+        res.json({
+            status: "SUCCESS",
+            message: "Task Active başarıyla güncellendi.",
+            data: result
+        })
+    })
+    .catch(err => {
+        res.json({
+            status: "FAILED",
+            message: "Güncelleme aşamasında bir hata oluştu.",
+            data: err
+        })
+    })
+}
+
 const getAllWorks = async (req,res) => {
     
     console.log("Method Type: GET | Get All Works")
@@ -139,6 +191,16 @@ const getAllWorks = async (req,res) => {
     const workDatas = await Work.find({userid})
 
     if(workDatas){
+        workDatas.forEach(item => {
+            gAllTasksCount(item["_id"])
+            .then(res => {
+                item['tum'] = res
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        });
+        console.log(workDatas)
         res.json({
             status: "SUCCESS",
             data: workDatas
@@ -171,12 +233,40 @@ const getAllTasks = async (req,res) => {
     }
 }
 
+const getAllTasksCount = async (req,res) => {
+    console.log("Method Type: GET | getAllTasksCount")
+    console.log("\n")
+    let id = req.body.id;
+    let workid = id
+    const tasks = await Task.find({workid});
+    let tum = tasks.length
+    let aktif = 0
+    let tamam = 0
+    
+
+    tasks.forEach(e => {
+        if(e["active"] == "false"){
+            aktif+=1
+        }else{
+            tamam+=1
+        }
+    });
+
+    const data = tum.toString()+","+aktif.toString()+","+tamam.toString()
+    console.log(data)
+
+    res.json({
+        status: "SUCCESS",
+        data: data
+    })
+}
+
 const addTaskToWork = async (req,res) => {
     
     console.log("Method Type: POST | Add Task To Work\n")
     console.log(req.body);
     console.log("\n\n")
-    let {userid,workid,title,long} = req.body;
+    let {userid,workid,title,long,active} = req.body;
     userid = userid.trim();
     workid = workid.trim();
     title = title.trim();
@@ -186,6 +276,7 @@ const addTaskToWork = async (req,res) => {
         workid,
         title,
         long,
+        active
     })
     task.save()
     .then(result => {
@@ -208,8 +299,10 @@ module.exports = {
     addWork,
     deleteWork,
     updateWorkStatus,
+    updateTaskActive,
     getAllWorks,
     addTaskToWork,
     getAllTasks,
+    getAllTasksCount,
     deleteTask
 }

@@ -2,11 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:proje/controllers/addMoney.dart';
-import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
 import 'package:proje/controllers/deleteMoney.dart';
 import 'package:proje/controllers/getAllMoney.dart';
-import 'package:proje/controllers/getAllTasks.dart';
+
 import 'dart:async';
 
 import 'package:proje/controllers/getAllWorks.dart';

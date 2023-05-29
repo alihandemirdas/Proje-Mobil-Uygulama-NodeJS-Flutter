@@ -8,6 +8,7 @@ import 'package:proje/controllers/addTaskToWork.dart';
 import 'package:proje/controllers/addWork.dart';
 import 'package:proje/controllers/deleteMoneyByWorkId.dart';
 import 'package:proje/controllers/getAllTasks.dart';
+import 'package:proje/controllers/getAllTasksCount.dart';
 import 'dart:async';
 
 import 'package:proje/controllers/getAllWorks.dart';
@@ -35,6 +36,7 @@ class _WorkPageState extends State<WorkPage>
   final TextEditingController moneyController = TextEditingController();
   DateTime? selectedDate;
   var selectedOption;
+  List<bool> checkedList = [];
 
 
   @override
@@ -110,48 +112,48 @@ class _WorkPageState extends State<WorkPage>
               SizedBox(height: 20,),
               Expanded(
                 child: ListView.builder(
-                    padding: EdgeInsets.all(2),
-                    shrinkWrap: true,
-                    itemCount: myList.length,
-                    itemBuilder: (context, index) {
-                      var containers = myList.map((e) => InkWell(
-                        onTap: () {
-                          print("buraya");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TaskPage(userid: widget.id, workid: e["_id"], name: widget.name, status: e["status"],),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          margin: EdgeInsets.all(7),
-                          padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Color(0xffD9D9D9),
+                  padding: EdgeInsets.all(2),
+                  shrinkWrap: true,
+                  itemCount: myList.length,
+                  itemBuilder: (context, index) {
+                    var containers = myList.map((e) => InkWell(
+                      onTap: () {
+                        print("buraya");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TaskPage(userid: widget.id, workid: e["_id"], name: widget.name, status: e["status"],),
                           ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
-                                ],
-                              ),
-                              SizedBox(height: 10,),
-                              Divider(color: Color(0xffEE6352), thickness: 1),
-                              Row(
-                                children: [
-                                  Expanded(child: Text(e["short"],),)
-                                ],
-                              ),
-                            ],
-                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(7),
+                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Color(0xffD9D9D9),
                         ),
-                      )).toList();
-                      return containers[index];
-                    }
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
+                              ],
+                            ),
+                            SizedBox(height: 10,),
+                            Divider(color: Color(0xffEE6352), thickness: 1),
+                            Row(
+                              children: [
+                                Expanded(child: Text(e["short"],),)
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )).toList();
+                    return containers[index];
+                  },
                 ),
               ),
             ],
@@ -160,6 +162,14 @@ class _WorkPageState extends State<WorkPage>
       ),
     );
 
+  }
+
+  doGetAllTasksCount(String id) async{
+    var res = await getAllTasksCount(id);
+    if (res['status'] == 'SUCCESS'){
+      String tum = res["data"];
+      return tum;
+    }
   }
 
   doGetAllTasks(String id) async{
@@ -177,6 +187,7 @@ class _WorkPageState extends State<WorkPage>
     if (res['status'] == 'SUCCESS'){
       myList = res['data'];
       print("Buraya geliyor.");
+      checkedList = List.generate(myList.length, (index) => false);
       setState(() {});
     }
     else{
@@ -225,7 +236,7 @@ class _WorkPageState extends State<WorkPage>
   }
 
   doAddTaskToWork(String title, String long) async{
-    var res = await addTaskToWork(widget.id, 'abc', title, long);
+    var res = await addTaskToWork(widget.id, 'abc', title, long, "false");
     if (res['status'] == 'SUCCESS'){
       showAlertDialog(context, "Görev başarıyla eklendi", "Başarılı");
       doGetAllWorks(widget.id);

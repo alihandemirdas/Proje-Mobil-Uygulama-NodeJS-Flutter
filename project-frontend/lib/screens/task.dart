@@ -11,6 +11,7 @@ import 'dart:async';
 
 import 'package:proje/controllers/getAllWorks.dart';
 import 'package:proje/controllers/updateMoneyType.dart';
+import 'package:proje/controllers/updateTaskActive.dart';
 import 'package:proje/controllers/updateWorkStatus.dart';
 import 'package:proje/screens/bottomnb.dart';
 import 'package:proje/screens/login.dart';
@@ -149,36 +150,65 @@ class _TaskPageState extends State<TaskPage>
                     padding: EdgeInsets.all(2),
                     itemCount: myList.length,
                     itemBuilder: (context, index) {
-                      var containers = myList.map((e) => InkWell(
-                        onTap: () {
-                          deleteTaskDialog(e["_id"]);
-                        },
-                        child: Container(
-                          margin: EdgeInsets.all(7),
-                          padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Color(0xffD9D9D9),
+                      var containers = myList.map((e) {
+                        int index = myList.indexOf(e);
+                        bool active;
+                        if(e["active"] == "false"){
+                          active = false;
+                        }else{
+                          active = true;
+                        }
+                        return GestureDetector(
+                          onTap: () {
+                            deleteTaskDialog(e["_id"]);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(7),
+                            padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Color(0xffD9D9D9),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Checkbox(
+
+                                            value: active,
+                                            onChanged: (bool? value) {
+                                              doUpdateTaskActive(e["_id"], e["active"]);
+                                            },
+                                          ),
+                                          Text(
+                                            e["title"],
+                                            style: TextStyle(
+                                              color: Color(0xff000000),
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                                Divider(color: Color(0xffEE6352), thickness: 1),
+                                Row(
+                                  children: [
+                                    Expanded(child: Text(e["long"]),)
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
-                                ],
-                              ),
-                              SizedBox(height: 10,),
-                              Divider(color: Color(0xffEE6352), thickness: 1),
-                              Row(
-                                children: [
-                                  Expanded(child: Text(e["long"]),)
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      )).toList();
+                        );
+                      }).toList();
                       return containers[index];
                     }
                 ),
@@ -199,6 +229,18 @@ class _TaskPageState extends State<TaskPage>
     else{
       showAlertDialog(context, res['message'], "Hata");
     }
+  }
+
+  doUpdateTaskActive(String id, String active) async{
+    var res = await updateTaskActive(id, active);
+    if (res['status'] == 'SUCCESS'){
+      doGetAllTasks(widget.workid);
+      setState(() {});
+    }
+    else{
+      showAlertDialog(context, res['message'], "Hata");
+    }
+
   }
 
   doUpdateWorkStatus(String nstatus, String status) async{
@@ -287,7 +329,7 @@ class _TaskPageState extends State<TaskPage>
   }
 
   doAddTaskToWork(String title, String long) async{
-    var res = await addTaskToWork(widget.userid, widget.workid, title, long);
+    var res = await addTaskToWork(widget.userid, widget.workid, title, long, "false");
     if (res['status'] == 'SUCCESS'){
       showAlertDialog(context, "Görev başarıyla eklendi", "Başarılı");
       doGetAllTasks(widget.workid);
