@@ -190,20 +190,54 @@ const getAllWorks = async (req,res) => {
     let userid = req.query.userid;
     const workDatas = await Work.find({userid})
 
+    /*const workDatas = [
+        {
+          _id: new ObjectId("646cb0f9d3e28bcac6a7967d"),
+          userid: new ObjectId("64355ec21e43b3e0cb25621e"),
+          title: 'Tasarim',
+          status: 'Aktif',
+          short: 'Sosyal medya icin tasarimlar yapilacak',
+          lastDate: '30.05.2023',
+          money: 1400,
+          __v: 0
+        },
+        {
+          _id: new ObjectId("646cb126d3e28bcac6a79682"),
+          userid: new ObjectId("64355ec21e43b3e0cb25621e"),
+          title: 'One Page Site',
+          status: 'Tamamlanmış',
+          short: 'Kurum icin tek sayfa site yapilacak',
+          lastDate: '26.05.2023',
+          money: 3200,
+          __v: 0
+        },
+        {
+          _id: new ObjectId("646cb154d3e28bcac6a79689"),
+          userid: new ObjectId("64355ec21e43b3e0cb25621e"),
+          title: 'Frontend',
+          status: 'Bekleyen',
+          short: 'Frontend kod yazilacak',
+          lastDate: '24.05.2023',
+          money: 2500,
+          __v: 0
+        }
+      ]*/
+
     if(workDatas){
-        workDatas.forEach(item => {
-            gAllTasksCount(item["_id"])
-            .then(res => {
-                item['tum'] = res
-            })
-            .catch(err => {
-                console.log(err);
-            })
-        });
-        console.log(workDatas)
+        var count = [];
+        for (const item of workDatas) {
+            try {
+            const res = await gAllTasksCount(item["_id"]);
+            console.log(res)
+            count.push(res)
+            } catch (err) {
+            console.log(err);
+            }
+        }
         res.json({
             status: "SUCCESS",
-            data: workDatas
+            data: workDatas,
+            count: count
         })
     }else{
         res.json({

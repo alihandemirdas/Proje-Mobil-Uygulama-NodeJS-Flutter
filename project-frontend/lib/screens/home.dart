@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage>
                       return Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Color(0xffD9D9D9)
+                            color: getColor(myList[i]["lastDate"], myList[i]["status"]),
                         ),
                         child: Container(
                           margin: EdgeInsets.all(10),
@@ -201,6 +201,28 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Color getColor(String date, String ok){
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd.MM.yyyy').format(now);
+
+    DateTime dateTime1 = DateFormat("dd.MM.yyyy").parse(formattedDate);
+    DateTime dateTime2 = DateFormat("dd.MM.yyyy").parse(date);
+
+    int comparisonResult = dateTime1.compareTo(dateTime2);
+
+    if(ok == "Tamamlanmış"){
+      return Color(0xff00AA1B);
+    }else{
+      if (comparisonResult < 0) {
+        return Color(0xffD9D9D9);
+      } else if (comparisonResult == 0) {
+        return Color(0xffD9D9D9);
+      } else {
+        return Colors.redAccent;
+      }
+    }
+  }
+
   doGetAllWorks(String id) async{
     var res = await getAllWorks(widget.userid);
     if (res['status'] == 'SUCCESS'){
@@ -214,10 +236,14 @@ class _HomePageState extends State<HomePage>
         return dateA.compareTo(dateB);
       });
 
-      myList = myList.sublist(0, 3);
-      print(myList);
+      var len = myList.length;
+      print(len);
+      if(len<3){
+        myList = myList.sublist(0, len);
+      }else{
+        myList = myList.sublist(0, 3);
+      }
 
-      print("Buraya geliyor.");
       setState(() {});
     }
     else{

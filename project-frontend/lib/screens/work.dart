@@ -29,6 +29,7 @@ class WorkPage extends StatefulWidget
 class _WorkPageState extends State<WorkPage>
 {
   List myList = [];
+  List parca = [];
   //String name = "";
   final TextEditingController titleController = TextEditingController();
   final TextEditingController shortController = TextEditingController();
@@ -127,28 +128,49 @@ class _WorkPageState extends State<WorkPage>
                         );
                       },
                       child: Container(
-                        margin: EdgeInsets.all(7),
-                        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Color(0xffD9D9D9),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Divider(color: Color(0xffEE6352), thickness: 1),
-                            Row(
-                              children: [
-                                Expanded(child: Text(e["short"],),)
-                              ],
-                            ),
-                          ],
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: getColor(e["lastDate"], e["status"]),
+                          ),
+                        child: Container(
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.fromLTRB(7, 8, 10, 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Color(0xffefefef),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(e["title"],style: TextStyle(color: Color(0xff000000),fontFamily: 'Montserrat', fontSize: 20, fontWeight: FontWeight.w600),),)
+                                ],
+                              ),
+                              SizedBox(height: 10,),
+                              Divider(color: Color(0xffEE6352), thickness: 1),
+                              Row(
+                                children: [
+                                  Expanded(child: Text(e["short"],),),
+                                ],
+                              ),
+                              SizedBox(height: 2,),
+                              Divider(color: Color(0xffEE6352), thickness: 0.5,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(child: Text("Son Tarih: \n"+e["lastDate"],style: TextStyle(fontSize: 13),),),
+                                  SizedBox(width: 10,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                    Text("Tüm:"+parca[index][0],style: TextStyle(fontSize: 12),),
+                                    Text("Aktif:"+parca[index][1],style: TextStyle(fontSize: 12),),
+                                    Text("Tamam:"+parca[index][2],style: TextStyle(fontSize: 12),),
+                                  ],)
+                                ],),
+                            ],
+                          ),
                         ),
                       ),
                     )).toList();
@@ -162,6 +184,28 @@ class _WorkPageState extends State<WorkPage>
       ),
     );
 
+  }
+
+  Color getColor(String date, String ok){
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd.MM.yyyy').format(now);
+
+    DateTime dateTime1 = DateFormat("dd.MM.yyyy").parse(formattedDate);
+    DateTime dateTime2 = DateFormat("dd.MM.yyyy").parse(date);
+
+    int comparisonResult = dateTime1.compareTo(dateTime2);
+
+    if(ok == "Tamamlanmış"){
+      return Color(0xff00AA1B);
+    }else{
+      if (comparisonResult < 0) {
+        return Color(0xffD9D9D9);
+      } else if (comparisonResult == 0) {
+        return Color(0xffD9D9D9);
+      } else {
+        return Colors.redAccent;
+      }
+    }
   }
 
   doGetAllTasksCount(String id) async{
@@ -186,6 +230,11 @@ class _WorkPageState extends State<WorkPage>
     var res = await getAllWorks(widget.id);
     if (res['status'] == 'SUCCESS'){
       myList = res['data'];
+      List count = res['count'];
+      for (String item in count) {
+        List items = item.split(",");
+        parca.add(items);
+      }
       print("Buraya geliyor.");
       checkedList = List.generate(myList.length, (index) => false);
       setState(() {});
