@@ -30,7 +30,6 @@ class _WorkPageState extends State<WorkPage>
 {
   List myList = [];
   List parca = [];
-  //String name = "";
   final TextEditingController titleController = TextEditingController();
   final TextEditingController shortController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
