@@ -44,4 +44,4 @@ Figma Tasarım Linki: https://www.figma.com/file/JkW8ZwDa0aOemGpBIrNvVE/Proje---
 <hr>
 
 <h3>Uygulama Görselleri</h3>
-[https://i.hizliresim.com/3luwn8y.png]
+![Uygulama Görselleri](gorsel.png)
